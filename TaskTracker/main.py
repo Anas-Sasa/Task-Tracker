@@ -114,10 +114,12 @@ while program_on:
     # Capture user input
     get_choice = input(f"\n\nEnter your choice ( 1 - {options} ): ").strip()
 
+    clear_terminal()
+
     # Ensure it si a digit and within range
     if not get_choice.isdigit()  or int(get_choice) > options or get_choice == "0":
 
-        print(f"\n\nInvalid entry: [ {get_choice} ]❗ Pelase enter ( 1 to {options} )❗")
+        print(f"\n\nInvalid entry: [ {get_choice} ]❗ Pelase enter ( 1 to {options} ).")
 
     # Ensure base directroy exists ( unless creating year or existing)
     elif not executor.count_dirs( BASE_DIR ) and int(get_choice) != 1 and int(get_choice) != 8:
@@ -193,6 +195,7 @@ while program_on:
 
 # BEFOR MAKING A NEW MONTH ANALIZE THE DATA OF THE CURRENT ONE AND ADD IT TO THE task_report.csv FILE
 
+
         # [ 3 ]
         elif choice == 3: # Create Month File
 
@@ -218,77 +221,86 @@ while program_on:
                 
                 clear_terminal()
 
-                print(f"\n\nTask: [ {folder_name} ] is not found in the list❗\n")
+                print(f"\n\nTask [ {folder_name} ] is not found in the list❗\n")
 
                 print("=" * 30)
                 executor.print_formatted_csv_table(file_path= tasks_csv)
                 print("=" *30 )
 
-
-            # Setup paths for the specific task
-            task_dir = os.path.join( BASE_DIR, current_year, folder_name )
-            months_csv =  os.path.join( task_dir, "months.csv" )
-            
-            # List To Store The Header Of The existing Month
-            csv_headers = []
-
-            # Get user input for month name
-            month = executor.get_month_name(months_list= MONTH_NAMES_LIST, months_path= months_csv)
-
-            clear_terminal()
-
-            # Setup path of the new month
-            new_month = os.path.join( task_dir, f"{month}.csv" )
-            
-           # CASE A: No months exist yet (Fresh Task) -> Ask for custom headers
-            if executor.read_csv(months_csv).empty:     
-
-                # Get Header For The New File
-                print("\n\nWhich details should be included in the file (header)?")
-
-                get_header = input("\n\nEnter header names separated by commas: ").strip()
-
-
-                # Check if is there a digit contains in the entry
-                if [num for num in get_header if num.isdigit()]:
-
-                    print("\n\nThe header can not contain digits.\n")
-                         
-                # Check if the entry is empty
-                elif not get_header:
-                    print("\n\nThe header list can't be empty.\n")
-
-                # Split input by comma to sotre in the file
-                csv_headers = [
-                    name.strip()
-                    for name in get_header.split(',') 
-                ]
-
-            # CASE B: Months exist -> Copy header from the previous month
             else:
-
-                # Get an existing month name
-                last_month = executor.get_latst_active_name( months_csv )
-
-                exist_month = os.path.join( task_dir, f"{last_month}.csv" )
-
-                # Read only header (neows=0)
-                df = pd.read_csv( exist_month, nrows= 0) 
-
-                # Extend The Header to The List 
-                csv_headers.extend( df.columns.to_list() )
                 
+                clear_terminal()
 
-            # Create the file and register it
-            header_clean = [name.lower() for name in csv_headers]
-            generator.make_file(path= new_month, header= header_clean)
-            executor.store_data(file_path= months_csv, data_list= [month])
+                # Setup paths for the specific task
+                task_dir = os.path.join( BASE_DIR, current_year, folder_name )
+                months_csv =  os.path.join( task_dir, "months.csv" )
+                
+                # List To Store The Header Of The existing Month
+                csv_headers = []
 
-            print(f"With CSV Header Row: {csv_headers}")
-            print("-" * 30)
+                # Get user input for month name
+                month = executor.get_month_name(months_list= MONTH_NAMES_LIST, months_path= months_csv)
 
-            print(f"\nNew month file: [ {month} ] is successfuly created into:\n")
-            print(f"- Directory: {task_dir}")
+
+                if not isinstance( month, str):
+                    pass
+
+                else:
+
+                    clear_terminal()
+
+                    # Setup path of the new month
+                    new_month = os.path.join( task_dir, f"{month}.csv" )
+
+                    # CASE A: No months exist yet (Fresh Task) -> Ask for custom headers
+                    if executor.read_csv(months_csv).empty:     
+
+                        # Get Header For The New File
+                        print("\n\nWhich details should be included in the file (header)?")
+
+                        get_header = input("\n\nEnter header names separated by commas: ").strip()
+
+
+                        # Check if is there a digit contains in the entry
+                        if [num for num in get_header if num.isdigit()]:
+
+                            print("\n\nThe header can not contain digits.\n")
+                                
+                        # Check if the entry is empty
+                        elif not get_header:
+                            print("\n\nThe header list can't be empty.\n")
+
+                        # Split input by comma to sotre in the file
+                        csv_headers = [
+                            name.strip()
+                            for name in get_header.split(',') 
+                        ]
+
+                    # CASE B: Months exist -> Copy header from the previous month
+                    else:
+
+                        # Get an existing month name
+                        last_month = executor.get_latst_active_name( months_csv )
+
+                        exist_month = os.path.join( task_dir, f"{last_month}.csv" )
+
+                        # Read only header (neows=0)
+                        df = pd.read_csv( exist_month, nrows= 0) 
+
+                        # Extend The Header to The List 
+                        csv_headers.extend( df.columns.to_list() )
+                        
+
+                    # Create the file and register it
+                    header_clean = [name.lower() for name in csv_headers]
+                    generator.make_file(path= new_month, header= header_clean)
+                    executor.store_data(file_path= months_csv, data_list= [month])
+
+                    print(f"With CSV Header Row: {csv_headers}")
+                    print("-" * 30)
+
+                    print(f"\nNew month file: [ {month} ] is successfuly created into:\n")
+                    print(f"- Directory: {task_dir}")
 
 
         # [ 4 ] 
@@ -386,7 +398,8 @@ while program_on:
 # 4. [DONE]   UI: Content display organized with separators.
 # 5. [DONE]   Bugfix: Pre-generation header data extraction verified.
 # 6. [DONE]   Bugfix: Resolved invalid month header error even when month name was correct.
-# 7. [DONE]    Structure: New tasks must generate default files:
+# 7. [DONE]   Fix: accepted entry of the string data and integer.
+# 8. [DONE]   Structure: New tasks must generate default files:
 #             - 'months.csv' (Active months tracker)
 #             - 'task_report.csv' (Analysis data).
 #             - Required Header: [month_name, days, hours, minutes].

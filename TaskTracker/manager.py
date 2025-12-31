@@ -110,6 +110,7 @@ class Executor():
             None: If the operation is canceled or input is invalid.
         """
 
+        self.clear_terminal()
 
         # Vliedat if main_dir has exist dir
         if not self.count_dirs(main_dir):
@@ -145,7 +146,7 @@ class Executor():
         # Ensure the entry is numeric
         if not get_content_num.isdigit():
 
-            print(f"\n\nInvalid entry: [{get_content_num}]. Only digits are accepted.\n")
+            print(f"\n\nInvalid entry: [ {get_content_num} ]. Only digits are accepted.\n")
             return
 
         # Convert the entry num to (int)
@@ -187,10 +188,7 @@ class Executor():
 
         # Reset terminal for Clarity
         self.clear_terminal()
-
- 
-
-            
+    
 
         # [Option 1 ]
         if sub_choice == 1: #  Remove a year
@@ -263,9 +261,8 @@ class Executor():
             shutil.rmtree( task_dir )
             
             # Show successful message
-            print(f"\nTask [{task_name}] removed successfully.\n")
+            print(f"\nTask [ {task_name} ] removed successfully.\n")
 
-    
 
         # [Option 3 ] 
         else: # Remove Month file or a specific data row in month
@@ -385,7 +382,7 @@ class Executor():
                 # Validate Range Validity
                 if row_index > file_len or row_index < 1:
 
-                    print(f"\n\nEntry [{row_num}] is out of range. Valid range is 1 to {file_len}.\n")
+                    print(f"\n\nEntry [ {row_num} ] is out of range. Valid range is 1 to {file_len}.\n")
                     return  
                 
                 # Read month file
@@ -671,13 +668,18 @@ class Executor():
                     
                 this_month = os.path.join( task_dir, f"{month}.csv" )
                 
-                print("-" * 50)
-
-                print(f"{month}:")
-
-                print("-" * 50)
+                if not os.path.exists(this_month):
+                    return None
                 
-                self.print_formatted_csv_table( this_month )
+                else:
+
+                    print("-" * 50)
+
+                    print(f"{month}:")
+
+                    print("-" * 50)
+                    
+                    self.print_formatted_csv_table( this_month )
 
             print(f"=" * 50)
 
@@ -716,7 +718,7 @@ class Executor():
         :param file_path: Target CSV file.
         :param data_list: Data to append.
         """
-
+        
         with open( file_path, "a", newline= "") as f:
 
             # set marker(pointer) at the end of file and reset it to the start
@@ -742,17 +744,23 @@ class Executor():
         -------
             bool: True if valid. False Otherwise
         """
+        if not entry:
 
-        
+            print(f"\nEntry [ {entry} ] can not be empty❗\n")
+            return False
+  
         # Validate Interger
         if entry_type == "int":
+    
+            for num in entry:
+        
+                if num.isdigit() or num in [".", " ", "-"]:
+                    continue
 
-            if not entry.isdigit():
-
-                print(f"\n\nInvalid entry [ { entry } ]. Only digits are accepted\n")
-                print(f"Invalid input: '{entry}'. Please check your indentation.")
-                return False
-            
+                else:
+                    print(f"\n\nInvalid Entry [ { num } ]. Only digits are accepted\n")
+                    return False
+                
 
         # Validate Time (Simple heuristic: digits or colon)
         if entry_type == "time":
@@ -763,7 +771,7 @@ class Executor():
                     continue
 
                 else:
-                    print(f"\n\nInvalid duration: [{entry}]❗ Use format H:MM or MM\n\n")
+                    print(f"\n\nInvalid duration: [ {entry} ]❗ Use format H:MM or MM\n\n")
                     return False
                     
         # Validate String ( Alpha or Spaces)
@@ -771,7 +779,7 @@ class Executor():
 
             for content in entry:
 
-                if content.isalpha() or content == " " or content == "_":
+                if content.isalpha() or content.isdigit() or content in [ " ", "_", "@", "."]:
                     continue
 
                 else:
@@ -869,7 +877,8 @@ class Executor():
             self.clear_terminal()
 
             # Show an error message
-            print(f"\nInvalid month entry: {get_month}❗\n")
+            print(f"\nEntry Month [ {get_month} ] Not Found in the List❗\n")
+            print(months_str)
             return None
   
         # Check if the month name is already used
