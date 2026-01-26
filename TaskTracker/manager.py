@@ -110,7 +110,6 @@ class Executor():
             None: If the operation is canceled or input is invalid.
         """
 
-        self.clear_terminal()
 
         # Vliedat if main_dir has exist dir
         if not self.count_dirs(main_dir):
@@ -173,6 +172,9 @@ class Executor():
         # Get a year name
         get_year = input("\n\nEnter a year from the top list: ").strip()
 
+        # Reset terminal for Clarity
+        self.clear_terminal()
+
         # Check if the year exist in the list names
         if get_year not in year_list_names:
 
@@ -186,9 +188,6 @@ class Executor():
         # Dataframe of tasks
         tasks_file = self.read_csv(tasks_path)
 
-        # Reset terminal for Clarity
-        self.clear_terminal()
-    
 
         # [Option 1 ]
         if sub_choice == 1: #  Remove a year
@@ -225,12 +224,13 @@ class Executor():
 
         get_task_idx = input("\nEnter task number from the top list to remove the choiced data:  ").strip()
 
+        self.clear_terminal()
+
         # Ensure the entry is numeric
         if not self.validate_inputs(get_task_idx, "int"):
 
             return
         
-  
         # Convert The Choice to (int)
         task_index = int( get_task_idx )
 
@@ -247,7 +247,6 @@ class Executor():
         # [Option 2 ]
         if sub_choice == 2: # Remove task dir
             
-
             # Delete the task name from the tasks tracker
             update_file = tasks_file[tasks_file["tasks"] != task_name]
             
@@ -278,15 +277,14 @@ class Executor():
             # Get number choice
             sub_choice = input("\n\nEnter a choice number: ").strip()
 
+            # Clear terminal
+            self.clear_terminal()
+
             # Check if the  entry in range
             if not sub_choice in [ "1", "2"]:
 
                 print(f"'\n\nEentry [ {sub_choice} ] is not accepted❗\n")
                 return
-
-
-            # Clear terminal
-            self.clear_terminal()
 
             # Path of the months file
             months_csv =  os.path.join( main_dir, get_year, task_name, "months.csv" )
@@ -302,6 +300,8 @@ class Executor():
 
             # Get month choice number
             get_month_idx = input("\n\nEnter month number from the top list:  ").strip()
+
+            self.clear_terminal()
 
             # Validate if entry is numeric
             if not self.validate_inputs(get_month_idx, "int"):
@@ -324,9 +324,6 @@ class Executor():
 
             # Path of the month
             current_month_path = os.path.join( main_dir, get_year, task_name, f"{month_name}.csv" )
-
-            # Clear terminal
-            self.clear_terminal()
 
 
             # [3.1] Delete entire month file
@@ -369,30 +366,31 @@ class Executor():
                 print("-" * 30) 
 
                 # Get Index number of the data row
-                row_num = input("\nEnter a number of data row from the top list to delete:  ").strip()
+                get_row_num = input("\nEnter a number of data row from the top list to delete:  ").strip()
+
+                self.clear_terminal()
 
                 # Validate if entry was digit
-                if not self.validate_inputs(row_num, "int"):
-
+                if not self.validate_inputs(get_row_num, "int"):
                     return
                 
                 # Convert data type of entry from 'str' to 'int'
-                row_index = int(row_num)
+                row_index = int(get_row_num)
 
                 # Validate Range Validity
                 if row_index > file_len or row_index < 1:
 
-                    print(f"\n\nEntry [ {row_num} ] is out of range. Valid range is 1 to {file_len}.\n")
+                    print(f"\n\nEntry [ {get_row_num} ] is out of range. Valid range is 1 to {file_len}.\n")
                     return  
                 
                 # Read month file
                 df = self.read_csv( current_month_path)
                 
                 # Row of the data as list to view it to the user
-                d_row = df.iloc[ row_index - 1 ].to_list()
+                row_data = df.iloc[ row_index - 1 ].to_list()
                 
                 # View list row data
-                print(f"\nData: { d_row }")
+                print(f"\nData: { row_data }")
                 print("-" * 20)
 
                 # Delete data row
@@ -482,8 +480,6 @@ class Executor():
         :param base_dir: Root directory of the data
         """
         
-        self.clear_terminal()
-        
         # Path of the CSV years file
         years_csv =  os.path.join(base_dir, "years.csv")
 
@@ -499,20 +495,19 @@ class Executor():
 
 
         # Ensure existence of years
-        if len(years_file) == 0:
+        if not len(years_file):
 
             print("\n\nNo active years exist! Please add an active year first!")
             return 
-
-    
-        # Display The Scope Of The Options
-        print("\n\nWhich content would you like to display?\n\n")
 
         options = [
             "1. Years (top-level directories)",
             "2. Tasks (within a selected Year)",
             "3. Entries in Month (from month.csv)",
             "4. Months (within a selected Task)"]
+    
+        # Display The Scope Of The Options
+        print("\n\nWhich content would you like to display?\n\n")
 
         print("\n".join(options))
         print("-" * 30)
@@ -521,6 +516,7 @@ class Executor():
         # Get a choice number of content
         get_content_num = input("\n\nEnter a number of the content to view:  ").strip()
 
+        self.clear_terminal()
 
         # Check if entry in range
         if get_content_num not in ["1", "2", "3", "4"]:
@@ -528,30 +524,22 @@ class Executor():
             print(f"\nInvalid entry: [ {get_content_num} ]! Valid choice is 1 to {len(options)}\n")
             return 
         
-        self.clear_terminal()
-
 
         # [ 1 ]
         if get_content_num == "1": # View Years
 
-            self.clear_terminal()
-
             self.print_formatted_csv_table(file_path= years_csv)
             return
 
-
-        # If entry is [ 1, 2 or 3 ]
-
-        # Clear terminal
-        self.clear_terminal()
-
-        # Select Year for [2, 3, 4]
+  
+        # Select Year for options [2, 3, 4]
         self.print_formatted_csv_table(file_path= years_csv)
         print("Which year would you like to view content?\n")
 
         # Get year
         get_year = input("\nEnter a year from the top list:  ").strip()
 
+        self.clear_terminal()
 
         # Check if year is exists
         if get_year not in years_file.years.to_list():
@@ -559,9 +547,6 @@ class Executor():
             print(f"\nEntry year: {get_year} does not exist\n")
             return
 
-
-        # Clear screen terminal
-        self.clear_terminal()
 
         # Full path of the entered year tasks
         tasks_csv = os.path.join( base_dir, get_year, "tasks.csv" )
@@ -588,6 +573,7 @@ class Executor():
         # Select Taks for [3, 4]
         get_task_num = input("\nEnter the task number from the top list: ").strip()
 
+        self.clear_terminal()
 
         # Ensure Entry is numeric
         if not get_task_num.isdigit():
@@ -628,14 +614,13 @@ class Executor():
         # [3] View specific month entries
         if get_content_num == "3":
             
-            # Clear terminal
-            self.clear_terminal()
-
             # View the exists months
             self.print_formatted_csv_table( months_csv )
 
             # Get the month name
             get_month = input("\n\nEnter a month name from the top list:  ").strip().capitalize()
+
+            self.clear_terminal()
 
             # Check if the name correct/exists
             if get_month not in months_list:
@@ -643,9 +628,6 @@ class Executor():
                 print(f"\n\nIncorrect month name: [ {get_month} ]\n")
                 return 
             
-            # Clear terminal
-            self.clear_terminal()
-
             # View data of the choiced month
             print(f"\n\n--- Task: {task_name} / Month: {get_month} ---\n")
             self.print_formatted_csv_table(file_path= os.path.join(task_dir, f"{get_month}.csv"))
@@ -653,9 +635,6 @@ class Executor():
         # [4] View All Months Data
         if get_content_num == "4": 
             
-            # Clear terminal
-            self.clear_terminal()
-
             # View the choiced task name
             print(f"\n\n")
             print(f"=" * 50)
@@ -805,9 +784,9 @@ class Executor():
             None: If the input is invalid or already exists.
         """
 
+
         # Get the last active year number name as (str)
         recommend_year = self.get_latst_active_name(years_path)
-        print("_" * 20)
 
         # Check if is there an exist year
         if recommend_year:
@@ -825,6 +804,8 @@ class Executor():
 
         # Get year 
         get_year = input("\n\nEnter a year:  ").strip()
+
+        self.clear_terminal()
 
         # Ensure The Year Not Older Than the Currentlly one.
         if not get_year.isdigit() or int(get_year) < self.default_year:
@@ -865,16 +846,15 @@ class Executor():
         print(f"\n\n{months_str}\n")
         print( "-" * 30)
 
-        print(f"\n\nSelect month name from the top list❗")
+        print(f"\n\nSelect a month name from the top list❗")
 
         # Aks month name
         get_month = input("\n\nEnter month:  ").strip().capitalize()
 
+        self.clear_terminal()
+
         # Check if entry is not in months list
         if get_month not in months_list:
-
-            # celan terminal
-            self.clear_terminal()
 
             # Show an error message
             print(f"\nEntry Month [ {get_month} ] Not Found in the List❗\n")
@@ -884,7 +864,6 @@ class Executor():
         # Check if the month name is already used
         if self.is_exist(months_path, get_month):
             
-            self.clear_terminal()
             print(f"Month: [ {get_month} ] already exist❗")
             return None
 
@@ -904,6 +883,8 @@ class Executor():
 
         # Get and clean input
         folder_name = input("\nEnter folder name: ").strip().lower()
+
+        self.clear_terminal()
 
         # Validate Entry in empty
         if not folder_name:
@@ -976,7 +957,3 @@ class Executor():
         if len(row_entries) == len(header):
             self.store_data(file_path= file_path, data_list= row_entries)
 
-
-# I FINISHED THIS FILE, BUT THERE IS SOME EXPLINATION IN EDG GIMINAI I SHOULD SEE.
-
-# THERE IS ALSO THE COMMITS OF GITHUB

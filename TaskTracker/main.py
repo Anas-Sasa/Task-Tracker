@@ -117,7 +117,7 @@ while program_on:
     clear_terminal()
 
     # Ensure it si a digit and within range
-    if not get_choice.isdigit()  or int(get_choice) > options or get_choice == "0":
+    if not get_choice.isdigit() or int(get_choice) > options or get_choice == "0":
 
         print(f"\n\nInvalid entry: [ {get_choice} ]❗ Pelase enter ( 1 to {options} ).")
 
@@ -135,12 +135,11 @@ while program_on:
         last_year = executor.get_latst_active_name(filepath= YEARS_CSV)
         current_year = str(last_year)
 
-        # Path of the exist tasks file
-        tasks_csv = os.path.join(BASE_DIR, current_year,"tasks.csv")
-
-
         # Path of the current year dir
         year_dir = os.path.join(BASE_DIR,current_year)
+
+        # Path of the exist tasks file
+        tasks_csv = os.path.join(year_dir,"tasks.csv")
 
         # [ 1 ]
         if choice == 1: # Create New Year Directory
@@ -152,8 +151,8 @@ while program_on:
             if isinstance(year, str):
 
                 new_year = os.path.join(BASE_DIR, year)
-                tasks_csv = os.path.join(new_year, "tasks.csv")
                 tasks_report_csv = os.path.join(new_year, "tasks_report.csv")
+                tasks_csv = os.path.join(new_year, "tasks.csv")
 
                 # Create physical directories and tracker files
                 generator.make_directory(path= new_year)
@@ -204,7 +203,6 @@ while program_on:
 
                 print(f"\n\nCreate First A Task❗ \n")
                 
-                
             # Show message to get choice of the view content
             print("\n\nWhich Task Needs A New Month❓ ")
 
@@ -216,10 +214,10 @@ while program_on:
             # Get Task Name
             folder_name = input("\nEnter task name from the top list:  ").strip().lower()
 
+            clear_terminal()
+
             # Validate task existence
             if not executor.is_exist(file_path= tasks_csv, name= folder_name):
-                
-                clear_terminal()
 
                 print(f"\n\nTask [ {folder_name} ] is not found in the list❗\n")
 
@@ -228,8 +226,6 @@ while program_on:
                 print("=" *30 )
 
             else:
-                
-                clear_terminal()
 
                 # Setup paths for the specific task
                 task_dir = os.path.join( BASE_DIR, current_year, folder_name )
@@ -242,12 +238,7 @@ while program_on:
                 month = executor.get_month_name(months_list= MONTH_NAMES_LIST, months_path= months_csv)
 
 
-                if not isinstance( month, str):
-                    pass
-
-                else:
-
-                    clear_terminal()
+                if isinstance( month, str):
 
                     # Setup path of the new month
                     new_month = os.path.join( task_dir, f"{month}.csv" )
@@ -310,48 +301,50 @@ while program_on:
             if executor.read_csv(tasks_csv).empty:
                 
                 print("\n\nThere is no active tasks to add data.\n")
-    
+
+            else:
  
-            # Display Tasks
-            print("=" *30 )   
-            executor.print_formatted_csv_table(tasks_csv)
-            print("=" * 30)
-         
-            # Get number of task
-            task_idx = input("\nEnter Task Number:  ").strip()
+                # Display Tasks
+                print("=" *30 )   
+                executor.print_formatted_csv_table(tasks_csv)
+                print("=" * 30)
+            
+                # Get number of task
+                task_idx = input("\nEnter Task Number:  ").strip()
 
-            # Validate entry if it is numeric
-            if executor.validate_inputs(entry= task_idx, entry_type= "int"):
-                
-                # Check Range balidity
-                if int(task_idx) > len(executor.read_csv(tasks_csv)) or int(task_idx) < 1:
+                clear_terminal()
 
-                    print(f"\n\nEntry: [ {task_idx} ] is out of range\n")
+                # Validate entry if it is numeric
+                if executor.validate_inputs(entry= task_idx, entry_type= "int"):
+                    
+                    # Check Range validity
+                    if int(task_idx) > len(executor.read_csv(tasks_csv)) or int(task_idx) < 1:
 
-                else:
-
-                    # get the task name dir
-                    task_record = executor.read_csv(tasks_csv).iloc[ int(task_idx) -1 ]
-                    task_dir_name = task_record.iloc[0]
-
-
-                    # Setup Paths of the choiced task
-                    task_path = os.path.join( BASE_DIR, current_year, task_dir_name )
-                    months_csv = os.path.join( task_path, "months.csv")
-
-                    # validate if the months exist to add data into
-                    if not executor.read_csv(months_csv).empty:
-                        
-                        # breng the last active month file name
-                        month_name = executor.get_latst_active_name( months_csv )
-                        
-                        month_file_path = os.path.join( task_path, f"{month_name}.csv")
-                        
-                        # Trigger data entry workflow
-                        executor.get_data( file_path= month_file_path )
+                        print(f"\n\nEntry: [ {task_idx} ] is out of range\n")
 
                     else:
-                        print("\n\nNo Active Months To Add Data❗Please Add First A Month\n")
+                        
+                        # get the task name dir
+                        task_record = executor.read_csv(tasks_csv).iloc[ int(task_idx) -1 ]
+                        task_dir_name = task_record.iloc[0]
+
+                        # Setup Paths of the choiced task
+                        task_path = os.path.join( BASE_DIR, current_year, task_dir_name )
+                        months_csv = os.path.join( task_path, "months.csv")
+
+                        # validate if the months exist to add data into
+                        if not executor.read_csv(months_csv).empty:
+                            
+                            # breng the last active month file name
+                            month_name = executor.get_latst_active_name( months_csv )
+                            
+                            month_file_path = os.path.join( task_path, f"{month_name}.csv")
+                            
+                            # Trigger data entry workflow
+                            executor.get_data( file_path= month_file_path )
+
+                        else:
+                            print("\n\nNo Active Months To Add Data❗Please Add First A Month\n")
           
 
         # [ 5 ]
